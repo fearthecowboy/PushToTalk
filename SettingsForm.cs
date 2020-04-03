@@ -285,7 +285,6 @@ namespace PushToTalk
             MicrophoneMuted = true;
         }
 
-        int i = 0;
         private void keyDown(object sender, KeyEventArgs e)
         {
             switch (key)
