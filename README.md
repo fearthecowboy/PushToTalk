@@ -1,5 +1,7 @@
 # PushToTalk
-A utility to mute/unmute the mic via hotkey (works for Teams, Skype, others, etc)
+A utility to mute/unmute the mic via hotkey (works for Teams, Skype, others, etc) for Windows.
+
+If you're looking for a Linux solution for this, try https://github.com/coddingtonbear/linux-push-to-talk/ 
 
 
 ## Install
