@@ -27,6 +27,5 @@ The tray icon will go from red to green when the mic is active.
 The settings are stored in the registry in HKCU/Software/FearTheCowboy/PushToTalk
 
 
-
-
+Updated to add support to have a visible indicator ![state](./docs/state.png)
 
