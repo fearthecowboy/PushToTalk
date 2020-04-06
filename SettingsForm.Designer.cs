@@ -47,7 +47,11 @@
             this.label3 = new System.Windows.Forms.Label();
             this.delay = new System.Windows.Forms.NumericUpDown();
             this.msec = new System.Windows.Forms.Label();
+            this.showMicState = new System.Windows.Forms.CheckBox();
+            this.opacity = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.delay)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.opacity)).BeginInit();
             this.SuspendLayout();
             // 
             // keyText
@@ -177,11 +181,50 @@
             this.msec.TabIndex = 11;
             this.msec.Text = "msec";
             // 
+            // showMicState
+            // 
+            this.showMicState.AutoSize = true;
+            this.showMicState.Checked = true;
+            this.showMicState.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.showMicState.Location = new System.Drawing.Point(16, 150);
+            this.showMicState.Name = "showMicState";
+            this.showMicState.Size = new System.Drawing.Size(206, 24);
+            this.showMicState.TabIndex = 13;
+            this.showMicState.Text = "Show Mic State Graphic";
+            this.showMicState.UseVisualStyleBackColor = true;
+            this.showMicState.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // opacity
+            // 
+            this.opacity.Location = new System.Drawing.Point(298, 149);
+            this.opacity.Name = "opacity";
+            this.opacity.Size = new System.Drawing.Size(97, 26);
+            this.opacity.TabIndex = 14;
+            this.opacity.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.opacity.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.opacity.ValueChanged += new System.EventHandler(this.opacity_ValueChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(230, 151);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(62, 20);
+            this.label4.TabIndex = 15;
+            this.label4.Text = "Opacity";
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(621, 174);
+            this.ClientSize = new System.Drawing.Size(621, 188);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.opacity);
+            this.Controls.Add(this.showMicState);
             this.Controls.Add(this.msec);
             this.Controls.Add(this.delay);
             this.Controls.Add(this.label3);
@@ -202,8 +245,10 @@
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "PushToTalk Settings";
+            this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.delay)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.opacity)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -223,6 +268,9 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown delay;
         private System.Windows.Forms.Label msec;
+        private System.Windows.Forms.CheckBox showMicState;
+        private System.Windows.Forms.NumericUpDown opacity;
+        private System.Windows.Forms.Label label4;
     }
 }
 

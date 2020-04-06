@@ -53,10 +53,13 @@ namespace PushToTalk
         private WaveOut wave = new WaveOut();
 
         private RegistryKey app = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Software").CreateSubKey("FearTheCowboy").CreateSubKey("PushToTalk");
+        private MicState micState;
+        private bool loading = false;
 
         public SettingsForm()
         {
             InitializeComponent();
+            micState = new MicState();
 
             CreateTrayIcon();
 
@@ -71,18 +74,36 @@ namespace PushToTalk
             loop = Task.Run(worker);
             keyText.Text = None;
             mouseText.Text = None;
-
-            Task.Delay(1).ContinueWith((p) => Invoke(new Action(load)));
-            
+            micState.LocationChanged += MicState_LocationChanged;
+            this.Load += SettingsForm_Load;
         }
 
+        private void SettingsForm_Load(object sender, EventArgs e)
+        {
+            load();
+        }
+
+        private void MicState_LocationChanged(object sender, EventArgs e)
+        {
+            save();
+        }
 
         private void save()
         {
+            if( loading )
+            {
+                return;
+            }
             app.SetValue("Key",keyText.Text, RegistryValueKind.String);
             app.SetValue("Buttons",mouseText.Text, RegistryValueKind.String);
             app.SetValue("Delay", (int)delay.Value, RegistryValueKind.DWord);
             app.SetValue("CancelMouseEvents", cancelMouse.Checked ? 1 : 0, RegistryValueKind.DWord);
+            app.SetValue("ShowMicState", showMicState.Checked ? 1: 0, RegistryValueKind.DWord);
+            app.SetValue("Opacity", (int)opacity.Value, RegistryValueKind.DWord);
+            app.SetValue("MicStateX", (int)micState.Location.X, RegistryValueKind.DWord);
+            app.SetValue("MicStateY", (int)micState.Location.Y, RegistryValueKind.DWord);
+            app.SetValue("SettingsX", (int)Location.X, RegistryValueKind.DWord);
+            app.SetValue("SettingsY", (int)Location.Y, RegistryValueKind.DWord);
         }
 
         private T[] parse<T>( string value )
@@ -97,6 +118,7 @@ namespace PushToTalk
 
         private void load()
         {
+            loading = true;
             keys.Clear();
             foreach ( var each in parse<Keys>(app.GetValue("Key")?.ToString() ?? None) ) {
                 keys.Add(each);
@@ -114,15 +136,33 @@ namespace PushToTalk
             delay.Value = Convert.ToInt32(app.GetValue("Delay", 250));
             cancelMouse.Checked = app.GetValue("CancelMouseEvents", 1) == (object)1;
 
-            if( keyText.Text == None && mouseText.Text == None)
+          
+            SetDesktopLocation(Convert.ToInt32(app.GetValue("SettingsX", 250)), Convert.ToInt32(app.GetValue("SettingsY", 250)));
+            
+            
+            micState.SetDesktopLocation(Convert.ToInt32(app.GetValue("MicStateX", Screen.PrimaryScreen.WorkingArea.Width - 300)), Convert.ToInt32(app.GetValue("MicStateY", 25)));
+
+            var o = Convert.ToInt32(app.GetValue("Opacity", 50));
+            micState.Opacity = ((float)o) / 100;
+            int sms = Convert.ToInt32(app.GetValue("ShowMicState", 1));
+                        
+            showMicState.Checked = sms != 0;
+            opacity.Value = o;
+            update();
+
+            if (keyText.Text == None && mouseText.Text == None)
             {
                 Show();
-            } else
+            }
+            else
             {
+                Task.Delay(2).ContinueWith((p) => Invoke(new Action(() => Hide())));
                 Hide();
                 mouse = mouseText.Text == None ? State.None : State.Active;
-                key= keyText.Text == None ? State.None : State.Active;
+                key = keyText.Text == None ? State.None : State.Active;
             }
+            loading = false;
+            
         }
 
         private IAudioEndpointVolume volumeControl
@@ -221,13 +261,22 @@ namespace PushToTalk
             };
             trayContext.Items.Add(exit);
 
-            notifier.Click += Notifier_Click;
+            notifier.MouseClick += Notifier_Click;
             notifier.ContextMenuStrip = trayContext;
         }
 
-        private void Notifier_Click(object sender, EventArgs e)
+        private void Notifier_Click(object sender, MouseEventArgs e)
         {
-            this.Show();
+            if (e.Button == MouseButtons.Left)
+            {
+                if( this.Visible)
+                {
+                    this.Hide();
+                } else
+                {
+                    this.Show();
+                }
+            }
         }
 
         private void worker()
@@ -274,6 +323,7 @@ namespace PushToTalk
                 active = true;
                 notifier.Icon = Resources.mic_on;
                 MicrophoneMuted = false;
+                micState.on();
             }
         }
 
@@ -283,6 +333,7 @@ namespace PushToTalk
             notifier.Icon = Resources.mic_off;
             PlaySound(Properties.Resources.off);
             MicrophoneMuted = true;
+            micState.off();
         }
 
         private void keyDown(object sender, KeyEventArgs e)
@@ -426,6 +477,37 @@ namespace PushToTalk
         private void cancelMouse_CheckedChanged(object sender, EventArgs e)
         {
             save();
+        }
+
+        private void update()
+        {
+            if (showMicState.Checked)
+            {
+                micState.Show();
+                micState.SetDesktopLocation(Convert.ToInt32(app.GetValue("MicStateX", Screen.PrimaryScreen.WorkingArea.Width - 300)), Convert.ToInt32(app.GetValue("MicStateY", 25)));
+            }
+            else
+            {
+                micState.Hide();
+            }
+            micState.Opacity = ((double)opacity.Value) / 100;
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            update();
+            save();
+        }
+
+        private void opacity_ValueChanged(object sender, EventArgs e)
+        {
+            update();
+            save();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            load();
         }
     }
 }
